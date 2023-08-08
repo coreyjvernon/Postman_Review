@@ -1,0 +1,197 @@
+{
+	"info": {
+		"_postman_id": "6ce7d474-bcbd-40e3-9718-b7042848b2b1",
+		"name": "Postman_Excercise",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "9012946"
+	},
+	"item": [
+		{
+			"name": "TempSF",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Validate 200 response",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"// Validate response time",
+							"pm.test(\"Response time is less than 400ms\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(400);",
+							"});",
+							"",
+							"var jsonData = pm.response.json();",
+							"",
+							"if(jsonData && jsonData.main && jsonData.main.temp) {",
+							"    //console.log(\"Temperature in San Francisco: \" + jsonData.main.temp + \"°F\");",
+							"    // Store the temperature in the 'temperature\" Collection variable",
+							"    pm.collectionVariables.set(\"temperature\", jsonData.main.temp);",
+							"    if(jsonData.main.temp > 60) {",
+							"        pm.collectionVariables.set(\"nextRequest\", \"Bangalore\");",
+							"    } else {",
+							"        pm.collectionVariables.set(\"nextRequest\", \"London\");",
+							"    }",
+							"    pm.test(\"Temperature is returned\", function() {",
+							"        pm.expect(jsonData.main.temp).to.be.a('number');",
+							"    });",
+							"    pm.test(\"Temperature is within range of 40°F to 80°F\", function() {",
+							"        pm.expect(jsonData.main.temp).to.be.above(39);",
+							"        pm.expect(jsonData.main.temp).to.be.below(81);",
+							"",
+							"    });",
+							"} else {",
+							"    pm.test(\"Temperature data is missing\", function() {",
+							"        throw new Error(\"Temperature data not found in response\");",
+							"    });",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://api.openweathermap.org/data/2.5/weather?q=San Francisco&units=imperial&appid=505a0c7771de7f017fd5d17c5d9fa89a",
+					"protocol": "http",
+					"host": [
+						"api",
+						"openweathermap",
+						"org"
+					],
+					"path": [
+						"data",
+						"2.5",
+						"weather"
+					],
+					"query": [
+						{
+							"key": "q",
+							"value": "San Francisco"
+						},
+						{
+							"key": "units",
+							"value": "imperial"
+						},
+						{
+							"key": "appid",
+							"value": "505a0c7771de7f017fd5d17c5d9fa89a"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "NewCity",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Validate 200 response",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"// Validate response time",
+							"pm.test(\"Response time is less than 400ms\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(400);",
+							"});",
+							"// Record temperature",
+							"var jsonData = pm.response.json();",
+							"",
+							"if(jsonData && jsonData.main && jsonData.main.temp) {",
+							"    pm.test(\"Temperature is returned\", function() {",
+							"        pm.expect(jsonData.main.temp).to.be.a('number');",
+							"    });",
+							"} else {",
+							"    pm.test(\"Temperature data is missing\", function() {",
+							"        throw new Error(\"Temperature data not found in response\");",
+							"    });",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"//if (pm.collectionVariables.get(\"nextRequest\") !== \"Bangalore\") {",
+							"    //console.error(\"Error: Collection variable 'nextRequest' does not equal 'Bangalore'. Stopping the test.\");",
+							"    //postman.setNextRequest(null);",
+							"//}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://api.openweathermap.org/data/2.5/weather?q={{nextRequest}}&units=imperial&appid=505a0c7771de7f017fd5d17c5d9fa89a",
+					"protocol": "http",
+					"host": [
+						"api",
+						"openweathermap",
+						"org"
+					],
+					"path": [
+						"data",
+						"2.5",
+						"weather"
+					],
+					"query": [
+						{
+							"key": "q",
+							"value": "{{nextRequest}}"
+						},
+						{
+							"key": "units",
+							"value": "imperial"
+						},
+						{
+							"key": "appid",
+							"value": "505a0c7771de7f017fd5d17c5d9fa89a"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "temperature",
+			"value": ""
+		},
+		{
+			"key": "nextRequest",
+			"value": ""
+		}
+	]
+}
